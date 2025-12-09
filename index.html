@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netwatch Script Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(138, 43, 226, 0.3) 0%, transparent 50%);
+            pointer-events: none;
+            animation: gradient-shift 15s ease infinite;
+        }
+        @keyframes gradient-shift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.1);
+            overflow: hidden;
+            position: relative;
+            backdrop-filter: blur(10px);
+            animation: float-in 0.6s ease-out;
+        }
+        @keyframes float-in {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        .header p {
+            position: relative;
+            z-index: 1;
+        }
+        .content {
+            padding: 50px 40px;
+        }
+        .form-group {
+            margin-bottom: 28px;
+            animation: slide-up 0.4s ease-out backwards;
+        }
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.15s; }
+        .form-group:nth-child(3) { animation-delay: 0.2s; }
+        .form-group:nth-child(4) { animation-delay: 0.25s; }
+        .form-group:nth-child(5) { animation-delay: 0.3s; }
+        @keyframes slide-up {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95em;
+            letter-spacing: 0.3px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e8e8e8;
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #7e22ce;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(126, 34, 206, 0.1);
+            transform: translateY(-2px);
+        }
+        .btn {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            color: white;
+            padding: 16px 35px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.15em;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(126, 34, 206, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(126, 34, 206, 0.4);
+        }
+        .btn:active {
+            transform: translateY(-1px);
+        }
+        .output-section {
+            margin-top: 40px;
+            display: none;
+            animation: fade-in 0.5s ease-out;
+        }
+        @keyframes fade-in {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .output-section.show {
+            display: block;
+        }
+        .script-box {
+            margin-bottom: 30px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .script-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .script-title {
+            background: linear-gradient(135deg, #2a5298 0%, #7e22ce 100%);
+            color: white;
+            padding: 18px 20px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.05em;
+        }
+        .script-content {
+            background: #1e1e1e;
+            color: #f8f8f2;
+            padding: 24px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+            line-height: 1.7;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            position: relative;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .script-content::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .script-content::-webkit-scrollbar-track {
+            background: #2d2d2d;
+        }
+        .script-content::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+        }
+        .script-content::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 9px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+        .copy-btn.copied {
+            background: #10b981;
+            border-color: #10b981;
+            transform: scale(1.1);
+        }
+        .preview-box {
+            background: linear-gradient(135deg, #25d366 0%, #20c95a 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 25px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-line;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .preview-box::before {
+            content: '📱';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 3em;
+            opacity: 0.15;
+        }
+        .preview-title {
+            font-weight: 600;
+            margin-bottom: 18px;
+            font-size: 1.15em;
+            position: relative;
+            z-index: 1;
+        }
+        .info-box {
+            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+            border-left: 5px solid #3b82f6;
+            padding: 18px 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.1);
+        }
+        .warning-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-left: 5px solid #f59e0b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            box-shadow: 0 2px 10px rgba(245, 158, 11, 0.1);
+            line-height: 1.8;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .footer p {
+            color: #64748b;
+            font-size: 0.9em;
+        }
+        .footer p:last-child {
+            color: #94a3b8;
+            font-size: 0.85em;
+            margin-top: 8px;
+        }
+        @media (max-width: 768px) {
+            .content {
+                padding: 30px 20px;
+            }
+            .header h1 {
+                font-size: 1.6em;
+            }
+            .header {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📡 Netwatch Script Generator</h1>
+            <p>Generate Mikrotik Netwatch Script dengan Mudah</p>
+            <p style="margin-top: 10px; font-size: 0.9em; opacity: 0.9;">Created by Muhammad Bagus Pribadi</p>
+        </div>
+
+        <div class="content">
+            <div class="info-box">
+                <strong>ℹ️ Info:</strong> Isi form di bawah untuk generate script netwatch monitoring Mikrotik yang terintegrasi dengan Telegram.
+            </div>
+
+            <form id="scriptForm">
+                <div class="form-group">
+                    <label for="deviceName">Nama Perangkat</label>
+                    <input type="text" id="deviceName" placeholder="Contoh: SMART PLUG" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ipAddress">IP Address</label>
+                    <input type="text" id="ipAddress" placeholder="Contoh: 192.168.1.100" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="location">Lokasi Perangkat</label>
+                    <input type="text" id="location" placeholder="Contoh: Ruang Server Lantai 2" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="botToken">Bot Token Telegram</label>
+                    <input type="text" id="botToken" placeholder="Contoh: 1234567890:ABCdefGHIjklMNOpqrsTUVwxyz" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="chatId">Chat ID Telegram</label>
+                    <input type="text" id="chatId" placeholder="Contoh: -1001234567890" required>
+                </div>
+
+                <button type="submit" class="btn">🚀 Generate Script</button>
+            </form>
+
+            <div id="outputSection" class="output-section">
+                <div class="script-box">
+                    <div class="script-title">
+                        <span>📤 Script UP</span>
+                        <button class="copy-btn" onclick="copyScript('upScript')">Copy</button>
+                    </div>
+                    <div class="script-content" id="upScript"></div>
+                </div>
+
+                <div class="script-box">
+                    <div class="script-title">
+                        <span>📥 Script DOWN</span>
+                        <button class="copy-btn" onclick="copyScript('downScript')">Copy</button>
+                    </div>
+                    <div class="script-content" id="downScript"></div>
+                </div>
+
+                <div class="preview-box">
+                    <div class="preview-title">📱 Preview Output Telegram:</div>
+                    <div id="previewOutput"></div>
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ Cara Implementasi:</strong><br>
+                    1. Buka <strong>Tools > Netwatch</strong> di Mikrotik<br>
+                    2. Tambah host baru dengan IP yang sudah diisi<br>
+                    3. Copy paste Script UP ke field <strong>Up Script</strong><br>
+                    4. Copy paste Script DOWN ke field <strong>Down Script</strong><br>
+                    5. Set interval sesuai kebutuhan (misal: 30s)<br>
+                    6. Klik OK/Apply
+                </div>
+
+                <div class="footer">
+                    <p>© 2025 Muhammad Bagus Pribadi</p>
+                    <p>Netwatch Script Generator for Mikrotik</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('scriptForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const deviceName = document.getElementById('deviceName').value;
+            const ipAddress = document.getElementById('ipAddress').value;
+            const location = document.getElementById('location').value;
+            const botToken = document.getElementById('botToken').value;
+            const chatId = document.getElementById('chatId').value;
+
+            const maxLength = Math.max(
+                'Nama Perangkat'.length,
+                'IP'.length,
+                'Lokasi'.length,
+                'Status'.length,
+                'Tanggal'.length,
+                'Waktu'.length
+            );
+
+            const nameSpaces = ' '.repeat(maxLength - 'Nama Perangkat'.length + 5);
+            const ipSpaces = ' '.repeat(maxLength - 'IP'.length + 5);
+            const locationSpaces = ' '.repeat(maxLength - 'Lokasi'.length + 5);
+            const statusSpaces = ' '.repeat(maxLength - 'Status'.length + 5);
+            const dateSpaces = ' '.repeat(maxLength - 'Tanggal'.length + 5);
+            const timeSpaces = ' '.repeat(maxLength - 'Waktu'.length + 5);
+
+            const upScript = `:local msg "\`\`\`%0ANama Perangkat${nameSpaces}: ${deviceName}%0AIP${ipSpaces}: ${ipAddress}%0ALokasi${locationSpaces}: ${location}%0AStatus${statusSpaces}: UP%0ATanggal${dateSpaces}: $[/system clock get date]%0AWaktu${timeSpaces}: $[/system clock get time]%0A\`\`\`"
+:do {
+  /tool fetch url="https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=$msg&parse_mode=Markdown" keep-result=no mode=https
+} on-error={
+  :log error "Telegram notification failed"
+}`;
+
+            const downScript = `:local msg "\`\`\`%0ANama Perangkat${nameSpaces}: ${deviceName}%0AIP${ipSpaces}: ${ipAddress}%0ALokasi${locationSpaces}: ${location}%0AStatus${statusSpaces}: DOWN%0ATanggal${dateSpaces}: $[/system clock get date]%0AWaktu${timeSpaces}: $[/system clock get time]%0A\`\`\`"
+:do {
+  /tool fetch url="https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=$msg&parse_mode=Markdown" keep-result=no mode=https
+} on-error={
+  :log error "Telegram notification failed"
+}`;
+
+            const previewText = `Nama Perangkat${nameSpaces}: ${deviceName}
+IP${ipSpaces}: ${ipAddress}
+Lokasi${locationSpaces}: ${location}
+Status${statusSpaces}: UP
+Tanggal${dateSpaces}: nov/14/2025
+Waktu${timeSpaces}: 13:25:00`;
+
+            document.getElementById('upScript').textContent = upScript;
+            document.getElementById('downScript').textContent = downScript;
+            document.getElementById('previewOutput').textContent = previewText;
+            document.getElementById('outputSection').classList.add('show');
+
+            document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        function copyScript(elementId) {
+            const scriptContent = document.getElementById(elementId).textContent;
+            const button = event.target;
+            
+            navigator.clipboard.writeText(scriptContent).then(function() {
+                const originalText = button.textContent;
+                button.textContent = '✓ Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(function() {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(function(err) {
+                alert('Gagal copy: ' + err);
+            });
+        }
+    </script>
+</body>
+</html>
